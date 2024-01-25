@@ -11,8 +11,8 @@ var Confg *Config
 
 const (
 	LoginErr   = "-1" // 厂商登录失败
-	MsgSuccess = "01" // 验证成功
-	MsgFail    = "02" // 验证失败
+	MsgSuccess = "01" // 消息校验成功
+	MsgFail    = "02" // 消息校验失败
 )
 
 type Config struct {
