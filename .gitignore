@@ -1,0 +1,13 @@
+.DS_Store/
+gkConn_/.idea
+.idea/
+z_test.go
+config.yaml
+pkg
+pkg/
+comlibgo
+comlibgo/
+env.yaml
+_log
+service_router.env
+_storage
