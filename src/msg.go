@@ -11,7 +11,7 @@ func save2Redis(factoryId, msg string) {
 	if factoryId == "" || factoryId == LoginErr {
 		return
 	}
-	if RedCacheDbs.LLen(factoryId).Val() > Confg.Redis.MaxLen {
+	if RedCacheDbs.LLen(factoryId).Val() > Confg.Server.MaxLen {
 		log.Error("Length exceeds maximum.......", RedCacheDbs.LLen(factoryId).Val())
 		return
 	}

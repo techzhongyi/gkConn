@@ -25,7 +25,6 @@ type Redis struct {
 	Host     string
 	Port     string
 	Password string
-	MaxLen   int64
 	Db       map[string]int
 }
 
@@ -35,10 +34,12 @@ type Factory struct {
 }
 
 type Server struct {
-	Name    string
-	Debug   bool
-	Port    string
-	LogPath string
+	Name         string
+	Debug        bool
+	Port         string
+	LogPath      string
+	MaxLen       int64 // 消息最大长度
+	DelayMinutes int64 // 延时函数执行时间
 }
 
 // String 目的很单一，打印Config 的时候 展示对应信息，而不是地址x

@@ -1,7 +1,6 @@
 package gkCore
 
 import (
-	"fmt"
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
 	"gk/src/helper"
@@ -26,15 +25,26 @@ var upgrader = websocket.Upgrader{
 var connStat = make(map[*websocket.Conn]string)
 
 // 延时函数创建连接后40分钟后触发，如果没有实现平台登录，关闭连接
-func delayConn(conn *websocket.Conn) {
-	fmt.Println("#######################################  delayConn")
+func delayConn(conn *websocket.Conn, ch chan MsgStat) {
+	log.Debug("#######################################  delayConn")
 	if connStat[conn] == "" || connStat[conn] == LoginErr {
 		log.Info("....................断开连接..................")
+		closeChan(ch)
 		err := conn.Close()
 		if err != nil {
 			log.Error("....................断开连接异常..................", err)
 		}
 	}
+}
+
+func closeChan(ch chan MsgStat) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Debug("delayConn recover", r)
+		}
+	}()
+	close(ch)
+
 }
 
 // 消息处理
@@ -64,7 +74,7 @@ func dealMsg(msg string, conn *websocket.Conn, ch chan<- MsgStat) string {
 			}
 		}
 	}
-	// 3
+	// 3 发送消息写数据到客户端
 	ch <- MsgStat{
 		msg:  msg,
 		stat: responseStat,
@@ -102,6 +112,7 @@ func write2Client(conn *websocket.Conn, ch <-chan MsgStat) {
 			log.Debug("不是FE不需要应答")
 		}
 	}
+	log.Debug("write2Client over.......")
 
 }
 
@@ -112,21 +123,22 @@ func HandlerWebsocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Info("....................建立连接..................")
+	ch := make(chan MsgStat)
 	defer func(conn *websocket.Conn) {
+		closeChan(ch)
 		connStat[conn] = ""
 		err := conn.Close()
 		if err != nil {
 		}
 	}(conn)
-	time.AfterFunc(40*time.Minute, func() {
+	time.AfterFunc(time.Duration(Confg.Server.DelayMinutes)*time.Minute, func() {
 		log.Info("延时函数执行啦！")
-		delayConn(conn)
+		delayConn(conn, ch)
 	})
-	ch := make(chan MsgStat)
 	go write2Client(conn, ch)
 	for {
 		messageType, p, err := conn.ReadMessage()
-		fmt.Println("@@@@@ ", messageType, *(*string)(unsafe.Pointer(&p)))
+		log.Debug("@@@@@ ", messageType, *(*string)(unsafe.Pointer(&p)))
 		if err != nil {
 			log.Error("--conn.ReadMessage err ", err)
 			connStat[conn] = ""
