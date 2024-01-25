@@ -62,7 +62,7 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: '*/gk']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: './comlibgo']], userRemoteConfigs: [[url: 'git@github.com:techzhongyi/comlibgo.git']]])
 
                 echo "拉取代码-${config_file.Server.Name}"
-                checkout([$class: 'GitSCM', branches: [[name: '*/gk']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: './code']], userRemoteConfigs: [[url: 'git@github.com:techzhongyi/'+config_file.Server.Name +'.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: './code']], userRemoteConfigs: [[url: 'git@github.com:techzhongyi/'+config_file.Server.Name +'.git']]])
             }
         }
 
