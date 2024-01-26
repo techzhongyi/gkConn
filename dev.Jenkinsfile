@@ -6,12 +6,13 @@ Server:
     Debug: True
     Port: 8081
     LogPath: ./_log/
+    MaxLen: 120000
+    DelayMinutes: 10
 
 Redis:
   Host: localhost
   Port: 6379
   Password: redis@6789
-  MaxLen: 120000
   Db:
     cache: 11  # 缓存
 
