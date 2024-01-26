@@ -116,7 +116,7 @@ pipeline {
                         echo "${element.key} ${element.value}"
                         list.add(element.key + '=' + element.value)
                     }
-                    dir('./build/bin') {
+                    dir('./build/bin/gk') {
                         sh "ls"
                         sh "mv ${config_file.Server.Name} ../../code"
                     }
