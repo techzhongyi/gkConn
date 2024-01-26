@@ -117,6 +117,7 @@ pipeline {
                         list.add(element.key + '=' + element.value)
                     }
                     dir('./build/bin') {
+                        sh "ls"
                         sh "mv ${config_file.Server.Name} ../../code"
                     }
                     sh 'rm -rf ./_logs'
