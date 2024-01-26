@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// Is32960 是否是32960协议
+// Is32960 是否是32960协议.
 func Is32960(msg string) bool {
 	// 校验协议头
 	if strings.HasPrefix(msg, "2323") == false {
