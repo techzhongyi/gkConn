@@ -1,4 +1,4 @@
-module gk
+module gkConn
 
 go 1.19
 

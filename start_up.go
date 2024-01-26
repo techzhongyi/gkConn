@@ -7,7 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/techzhongyi/comlibgo/mhandler"
 	"github.com/techzhongyi/comlibgo/util"
-	gkCore "gk/src"
+	gkCore "gkConn/src"
 	"net/http"
 	"path"
 )

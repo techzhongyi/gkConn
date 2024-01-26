@@ -3,7 +3,7 @@ package gkCore
 import (
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
-	"gk/src/helper"
+	"gkConn/src/helper"
 	"net/http"
 	"time"
 	"unsafe"
