@@ -105,9 +105,9 @@ func write2Client(conn *websocket.Conn, ch <-chan MsgStat) {
 			response := helper.GetResponseMsg(v.stat, v.msg)
 			err := conn.WriteMessage(1, *(*[]byte)(unsafe.Pointer(&response)))
 			if err != nil {
-				log.Error("$$$$$$$$$$$$ conn.WriteMessage err", err)
+				log.Error("$$$$$$$$$$$$ reply err", err)
 			}
-			log.Debug("...................需要应答 write success ", response)
+			log.Debug("...................需要应答 reply success ", response)
 
 		default:
 			log.Debug("不是FE不需要应答")
