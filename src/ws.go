@@ -84,7 +84,7 @@ func dealMsg(msg string, conn *websocket.Conn, ch chan<- MsgStat) string {
 	return connStat[conn]
 }
 
-// 校验厂商的用户名和密码,如果成功返回厂商id
+// 校验厂商的用户名和密码,如果成功返回厂商id.
 func validFactory(msg string) string {
 	name, password := helper.GetFactoryInfo(msg)
 	log.Debug("factoryInfo ---> ", name, "--------", password)
