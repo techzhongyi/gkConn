@@ -138,8 +138,8 @@ func HandlerWebsocket(w http.ResponseWriter, r *http.Request) {
 	})
 	go write2Client(conn, ch)
 	for {
-		messageType, p, err := conn.ReadMessage()
-		log.Debug("@@@@@ ", messageType, *(*string)(unsafe.Pointer(&p)))
+		_, p, err := conn.ReadMessage()
+		//log.Debug("@@@@@ ", messageType, *(*string)(unsafe.Pointer(&p)))
 		if err != nil {
 			log.Error("--conn.ReadMessage err ", err)
 			connStat[conn] = ""
