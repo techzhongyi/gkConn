@@ -70,6 +70,7 @@ func GetReply(msg string) string {
 func GetFactoryInfo(msg string) (string, string) {
 	defer func() {
 		if r := recover(); r != nil {
+			log.Error("GetFactoryInfo", r)
 		}
 	}()
 	if IsLogin(msg) == false {
@@ -77,7 +78,7 @@ func GetFactoryInfo(msg string) (string, string) {
 	}
 	body := msg[48 : len(msg)-2]
 	name, _ := hex.DecodeString(body[16:40])
-	password, _ := hex.DecodeString(body[40:60])
+	password, _ := hex.DecodeString(body[40:80])
 	return string(name), string(password)
 
 }
@@ -88,6 +89,9 @@ func GetResponseMsg(responseStat string, msg string) string {
 	newMsg := msg[0:4] + msg[4:6] + responseStat + msg[8:42] + msg[42:44] + "0006" + msg[48:60] + "**"
 	rr := GetBccChecksum(newMsg)
 	code := strconv.FormatUint(uint64(rr), 16)
+	if len(code) == 1 {
+		code = "0" + code
+	}
 	return newMsg[:len(newMsg)-2] + code
 
 }

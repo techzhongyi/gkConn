@@ -87,11 +87,15 @@ func dealMsg(msg string, conn *websocket.Conn, ch chan<- MsgStat) string {
 // 校验厂商的用户名和密码,如果成功返回厂商id
 func validFactory(msg string) string {
 	name, password := helper.GetFactoryInfo(msg)
+	log.Debug("factoryInfo ---> ", name, "--------", password)
 	for _, v := range Confg.Factorys {
+		log.Info("-------------- ", v.Name, "--------------", v.Password)
 		if v.Name == name && v.Password == password {
+			log.Info("--------------login success")
 			return name
 		}
 	}
+	log.Error("--------------login fail")
 	return LoginErr
 
 }
@@ -149,7 +153,7 @@ func HandlerWebsocket(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		msg := *(*string)(unsafe.Pointer(&p))
-		log.Debug("===========================================================================================")
+		log.Debug("##########################################################################################")
 		log.Debug(".............received: ", msg)
 		save2Redis(dealMsg(msg, conn, ch), msg)
 	}

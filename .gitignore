@@ -12,3 +12,4 @@ _log
 service_router.env
 _storage
 go_build_gk
+go_build_gkConn

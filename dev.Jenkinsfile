@@ -18,8 +18,8 @@ Redis:
 
 Factorys:
   - # 车企用户名密码
-    Name: name1
-    Password: password1
+    Name: gkzydeepway1
+    Password: swddffgdr56u990hjkff
   - # 车企用户名密码
     Name: name2
     Password: password2

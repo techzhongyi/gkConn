@@ -8,14 +8,14 @@ import (
 )
 
 func TestValidCode(t *testing.T) {
-	oriMsg := "232302FE4C464E41344C4441324A41583033343234010025170C1D0B261E0101030101260022DAD014AA29546301211388FFFF0500062EE5B90226890E01"
+	oriMsg := "232305FE11111111111111111111111111111111110100521111111111112222676b7a796465657077617931737764646666676472353675393930686a6b666601a7"
 	ok := ValidCode(oriMsg)
 	fmt.Println(ok)
 
 }
 
 func TestGetResponseMsg(t *testing.T) {
-	msg := "232302FE4C464E41344C4441324A41583033343234010025170C1D0B261E0101030101260022DAD014AA29546301211388FFFF0500062EE5B90226890E01"
+	msg := "232305FE11111111111111111111111111111111110100521111111111112222676b7a796465657077617931737764646666676472353675393930686a6b666601a7"
 	reply := GetResponseMsg("01", msg)
 	fmt.Println("应答消息: ", reply, len(reply))
 	ok := ValidCode(reply)
@@ -24,7 +24,7 @@ func TestGetResponseMsg(t *testing.T) {
 }
 
 func Test1(t *testing.T) {
-	msg := "232302FE4C464E41344C4441324A41583033343234010025170C1D0B261E0101030101260022DAD014AA29546301211388FFFF0500062EE5B90226890E01"
+	msg := "232305FE11111111111111111111111111111111110100521111111111112222676b7a796465657077617931737764646666676472353675393930686a6b666601a7"
 	fmt.Println("起始符:", msg[0:4])
 	fmt.Println("命令标识:", msg[4:6])
 	fmt.Println("应答标志:", msg[6:8])
@@ -35,50 +35,71 @@ func Test1(t *testing.T) {
 
 }
 
-func Test2(t *testing.T) {
+func TestGenerateLogin(t *testing.T) {
+	uk := ""
+	for i := 0; i < 34; i++ {
+		uk += fmt.Sprint(1)
+	}
+	time := "111111111111"
+	no := "2222"
+	name := "676b7a796465657077617931"
+	pass := "737764646666676472353675393930686a6b6666"
+	rule := "01"
+	body := time + no + name + pass + rule
+	msg := "2323" + "05" + "FE" + uk + "01" + "0052" + body + "**"
+	print("vvvvvvv", len("2323"+"05"+"FE"+uk+"01"+"52"))
+	rr := GetBccChecksum(msg)
+	fmt.Println("rr=", rr)
+	code := strconv.FormatInt(int64(rr), 16)
+	fmt.Println("code=", code)
+	if len(code) == 1 {
+		code = "0" + code
+	}
+	v := msg[:len(msg)-2] + code
+	fmt.Println(v)
+	fmt.Println(len(v))
+	name, pass = GetFactoryInfo(v)
+	fmt.Println(name, " -- ", pass)
+}
+
+func TestConver(t *testing.T) {
+	// 将字符串编码成十六进制格式
+	ss := "gkzydeepway1" // 要转换的字符串
+	hexStr := hex.EncodeToString([]byte(ss))
+	fmt.Println("字符串转十六进制:", hexStr, " len=", len(hexStr))
+
 	// 16进制转字符串
-	hexStr := "4C464E41344C4441324A41583033343234" // 十六进制字符串 "48656c6c6f"
-	// 将十六进制字符串解码为字节切片
 	bytes, err := hex.DecodeString(hexStr)
 	if err != nil {
 		fmt.Println("解码失败:", err)
 		return
 	}
-	// 将字节切片转换为字符串
 	str := string(bytes)
-	fmt.Println(str)
+	fmt.Println("十六进制转字符串:", str)
 
-	// 单个16进制转字符串
-	hexStr2 := "34" // 十六进制字符串 "41"
-	// 将十六进制字符串转换为整数值
-	intValue, err := strconv.ParseInt(hexStr2, 16, 64)
+	//// 单个16进制转字符串
+	//hexStr2 := "34" // 十六进制字符串 "41"
+	//// 将十六进制字符串转换为整数值
+	//intValue, err := strconv.ParseInt(hexStr2, 16, 64)
+	//if err != nil {
+	//	fmt.Println("转换失败:", err)
+	//	return
+	//}
+	//fmt.Println(intValue)
+	//fmt.Println(fmt.Sprintf("%c", intValue))
+}
+
+func TestConver2(t *testing.T) {
+	// 10进制转16进制串
+	decimal := 82
+	hex := fmt.Sprintf("%X", decimal)
+	fmt.Println(hex)
+
+	// 16进制串转10进制
+	xx, err := strconv.ParseInt(hex, 16, 64)
 	if err != nil {
 		fmt.Println("转换失败:", err)
 		return
 	}
-	fmt.Println(intValue)
-	fmt.Println(fmt.Sprintf("%c", intValue))
-}
-
-func TestConv(t *testing.T) {
-	hexStr := "0025" // 十六进制字符串 "1A"
-	// 将十六进制字符串转换为十进制整数
-	decimalValue, err := strconv.ParseInt(hexStr, 16, 64)
-	if err != nil {
-		fmt.Println("转换失败:", err)
-		return
-	}
-	fmt.Printf("16进制转化为10进制 %s -> %d\n", hexStr, decimalValue)
-	// 十 进制转十六进制
-	decimalValue = 6 // 十六进制字符串 "1A"
-	s := strconv.FormatInt(int64(decimalValue), 16)
-	fmt.Printf("10进制转化为16进制 %d -> %s\n", decimalValue, s)
-}
-
-func TestGetFactoryInfo(t *testing.T) {
-	a, b := GetFactoryInfo("232302FE4C464E41344C4441324A41583033343234010025170C1D0B261E0101030101260022DAD014AA29546301211388FFFF0500062EE5B90226890E01")
-	fmt.Printf(" a=%s, b=%s\n", a, b)
-	fmt.Println(" xxxxx", a == "")
-	fmt.Println(" yyyyy", b == "")
-
+	fmt.Println(xx)
 }
