@@ -23,6 +23,6 @@ func main() {
 	// 初始化redis
 	gkCore.RedCacheDbs = util.InitRedis(gkCore.Confg.Redis.Host+":"+gkCore.Confg.Redis.Port,
 		gkCore.Confg.Redis.Password, gkCore.Confg.Redis.Db["cache"])
-	http.HandleFunc("/gkws", gkCore.HandlerWebsocket)
+	http.HandleFunc("/gk_conn", gkCore.HandlerWebsocket)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", gkCore.Confg.Server.Port), nil))
 }

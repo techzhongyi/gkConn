@@ -62,6 +62,7 @@ func dealMsg(msg string, conn *websocket.Conn, ch chan<- MsgStat) string {
 			// 平台首次登录
 			if helper.IsLogin(msg) {
 				connStat[conn] = validFactory(msg)
+				log.Info("######################################### 登录 #########################################", connStat[conn])
 				if connStat[conn] == LoginErr {
 					responseStat = MsgFail
 				}
@@ -69,7 +70,8 @@ func dealMsg(msg string, conn *websocket.Conn, ch chan<- MsgStat) string {
 		} else {
 			// 登出操作重置连接状态
 			if helper.IsSignOut(msg) {
-				// 连接状态依然有效，客户端如果主动关闭连接再置状态 todo
+				log.Info(".######################################### 登出 #########################################", connStat[conn])
+				// 连接状态依然有效，客户端如果主动关闭连接再置状态
 				//connStat[conn] = ""
 			}
 		}
@@ -148,7 +150,8 @@ func HandlerWebsocket(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		msg := *(*string)(unsafe.Pointer(&p))
-		log.Debug("................ received: ", msg)
+		log.Debug("===========================================================================================")
+		log.Debug(".............received: ", msg)
 		save2Redis(dealMsg(msg, conn, ch), msg)
 	}
 
