@@ -102,13 +102,12 @@ func write2Client(conn *websocket.Conn, ch <-chan MsgStat) {
 		reply := helper.GetReply(v.msg)
 		switch reply {
 		case "FE":
-			log.Debug("应答标识是FE，需要应答")
 			response := helper.GetResponseMsg(v.stat, v.msg)
 			err := conn.WriteMessage(1, *(*[]byte)(unsafe.Pointer(&response)))
 			if err != nil {
 				log.Error("$$$$$$$$$$$$ conn.WriteMessage err", err)
 			}
-			log.Debug("................... write success ", response)
+			log.Debug("...................需要应答 write success ", response)
 
 		default:
 			log.Debug("不是FE不需要应答")
