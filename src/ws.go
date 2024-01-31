@@ -1,10 +1,11 @@
 package gkCore
 
 import (
-	"bufio"
+	"fmt"
 	log "github.com/sirupsen/logrus"
 	"gkConn/src/helper"
 	"net"
+	"strconv"
 	"time"
 )
 
@@ -112,13 +113,36 @@ func write2Client(conn net.Conn, ch <-chan MsgStat) {
 
 }
 
+func parseMsg(conn net.Conn) (_err error, _msg string) {
+	defer func() {
+		if r := recover(); r != nil {
+			_err = fmt.Errorf("%s", r)
+			_msg = "-4"
+		}
+	}()
+	bufferHead := make([]byte, 48)
+	_, err := conn.Read(bufferHead)
+	if err != nil {
+		return err, "-1"
+	}
+	dataLen, err := strconv.ParseInt(string(bufferHead)[len(string(bufferHead))-4:], 16, 64)
+	if err != nil {
+		return err, "-2"
+	}
+	bufferBody := make([]byte, dataLen+2)
+	_, err = conn.Read(bufferBody)
+	if err != nil {
+		return err, "-3"
+	}
+	return nil, string(bufferHead) + string(bufferBody)
+}
+
 func HandleConnection(conn net.Conn) {
 	log.Info("....................建立连接..................")
 	defer func(conn net.Conn) {
 		log.Info("@@@@@@@@@@@@@@@@@@@@ --- conn close --- @@@@@@@@@@@@@@@@@@@@")
 		err := conn.Close()
 		if err != nil {
-
 		}
 	}(conn)
 	ch := make(chan MsgStat)
@@ -127,24 +151,13 @@ func HandleConnection(conn net.Conn) {
 		delayConn(conn, ch)
 	})
 	go write2Client(conn, ch)
-	reader := bufio.NewReader(conn)
-	bufferSize := 10
-	buffer := make([]byte, bufferSize)
 	for {
-		msg := ""
-		for {
-			n, err := reader.Read(buffer)
-			if err != nil {
-				log.Error("--conn.ReadMessage err ", err)
-				connStat[conn] = ""
-				return
-			}
-			data := buffer[:n] // 获取已经读取的部分数据
-			msg += string(data)
-			if n < bufferSize {
-				break
-			}
-
+		// 根据数据长度读取数据
+		err, msg := parseMsg(conn)
+		if err != nil {
+			log.Error("------------- parseMsg err ", err, msg)
+			connStat[conn] = ""
+			return
 		}
 		log.Debug("##########################################################################################")
 		log.Debug("@@@@received: ", len(msg), "----", msg)

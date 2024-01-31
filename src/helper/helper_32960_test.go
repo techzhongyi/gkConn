@@ -46,18 +46,15 @@ func TestGenerateLogin(t *testing.T) {
 	pass := "737764646666676472353675393930686a6b6666"
 	rule := "01"
 	body := time + no + name + pass + rule
+	fmt.Println("vvvvv ", len(body))
 	msg := "2323" + "05" + "FE" + uk + "01" + "0052" + body + "**"
-	print("vvvvvvv", len("2323"+"05"+"FE"+uk+"01"+"52"))
 	rr := GetBccChecksum(msg)
-	fmt.Println("rr=", rr)
 	code := strconv.FormatInt(int64(rr), 16)
-	fmt.Println("code=", code)
 	if len(code) == 1 {
 		code = "0" + code
 	}
 	v := msg[:len(msg)-2] + code
-	fmt.Println(v)
-	fmt.Println(len(v))
+	fmt.Println(len(v), "---", v)
 	name, pass = GetFactoryInfo(v)
 	fmt.Println(name, " -- ", pass)
 }
@@ -96,7 +93,7 @@ func TestConver2(t *testing.T) {
 	fmt.Println(hex)
 
 	// 16进制串转10进制
-	xx, err := strconv.ParseInt(hex, 16, 64)
+	xx, err := strconv.ParseInt("2323", 16, 64)
 	if err != nil {
 		fmt.Println("转换失败:", err)
 		return

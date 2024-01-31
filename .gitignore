@@ -13,3 +13,4 @@ service_router.env
 _storage
 go_build_gk
 go_build_gkConn
+go_build_start_up_go
