@@ -1,12 +1,11 @@
 package gkCore
 
 import (
-	"github.com/gorilla/websocket"
+	"bufio"
 	log "github.com/sirupsen/logrus"
 	"gkConn/src/helper"
-	"net/http"
+	"net"
 	"time"
-	"unsafe"
 )
 
 type MsgStat struct {
@@ -14,18 +13,10 @@ type MsgStat struct {
 	stat string
 }
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-var connStat = make(map[*websocket.Conn]string)
+var connStat = make(map[net.Conn]string)
 
 // 延时函数创建连接后40分钟后触发，如果没有实现平台登录，关闭连接
-func delayConn(conn *websocket.Conn, ch chan MsgStat) {
+func delayConn(conn net.Conn, ch chan MsgStat) {
 	log.Debug("#######################################  delayConn")
 	if connStat[conn] == "" || connStat[conn] == LoginErr {
 		log.Info("....................断开连接..................")
@@ -48,7 +39,7 @@ func closeChan(ch chan MsgStat) {
 }
 
 // 消息处理
-func dealMsg(msg string, conn *websocket.Conn, ch chan<- MsgStat) string {
+func dealMsg(msg string, conn net.Conn, ch chan<- MsgStat) string {
 	// 1 如果不是32960协议不处理
 	if helper.Is32960(msg) == false {
 		return ""
@@ -62,7 +53,7 @@ func dealMsg(msg string, conn *websocket.Conn, ch chan<- MsgStat) string {
 			// 平台首次登录
 			if helper.IsLogin(msg) {
 				connStat[conn] = validFactory(msg)
-				log.Info("######################################### 登录 #########################################", connStat[conn])
+				log.Info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 登录 >>>>>>>>>>>>>>>>>>>>>>>>>", connStat[conn])
 				if connStat[conn] == LoginErr {
 					responseStat = MsgFail
 				}
@@ -101,17 +92,17 @@ func validFactory(msg string) string {
 }
 
 // 从ch读取消息发送给client。消息应答。如果应答标识是FE，需要应答；不是FE不需要应答
-func write2Client(conn *websocket.Conn, ch <-chan MsgStat) {
+func write2Client(conn net.Conn, ch <-chan MsgStat) {
 	for v := range ch {
 		reply := helper.GetReply(v.msg)
 		switch reply {
 		case "FE":
 			response := helper.GetResponseMsg(v.stat, v.msg)
-			err := conn.WriteMessage(1, *(*[]byte)(unsafe.Pointer(&response)))
+			_, err := conn.Write([]byte(response))
 			if err != nil {
 				log.Error("$$$$$$$$$$$$ reply err", err)
 			}
-			log.Debug("...................需要应答 reply success ", response)
+			log.Debug("@@@应答 reply success ", response)
 
 		default:
 			log.Debug("不是FE不需要应答")
@@ -121,41 +112,89 @@ func write2Client(conn *websocket.Conn, ch <-chan MsgStat) {
 
 }
 
-func HandlerWebsocket(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Info(err)
-		return
-	}
+func HandleConnection(conn net.Conn) {
 	log.Info("....................建立连接..................")
-	ch := make(chan MsgStat)
-	defer func(conn *websocket.Conn) {
-		closeChan(ch)
-		connStat[conn] = ""
+	defer func(conn net.Conn) {
+		log.Info("@@@@@@@@@@@@@@@@@@@@ --- conn close --- @@@@@@@@@@@@@@@@@@@@")
 		err := conn.Close()
 		if err != nil {
+
 		}
 	}(conn)
+	ch := make(chan MsgStat)
 	time.AfterFunc(time.Duration(Confg.Server.DelayMinutes)*time.Minute, func() {
 		log.Info("延时函数执行啦！")
 		delayConn(conn, ch)
 	})
 	go write2Client(conn, ch)
+	reader := bufio.NewReader(conn)
+	bufferSize := 10
+	buffer := make([]byte, bufferSize)
 	for {
-		_, p, err := conn.ReadMessage()
-		//log.Debug("@@@@@ ", messageType, *(*string)(unsafe.Pointer(&p)))
-		if err != nil {
-			log.Error("--conn.ReadMessage err ", err)
-			connStat[conn] = ""
-			err := conn.Close()
+		msg := ""
+		for {
+			n, err := reader.Read(buffer)
 			if err != nil {
+				log.Error("--conn.ReadMessage err ", err)
+				connStat[conn] = ""
+				return
 			}
-			return
+			data := buffer[:n] // 获取已经读取的部分数据
+			msg += string(data)
+			if n < bufferSize {
+				break
+			}
+
 		}
-		msg := *(*string)(unsafe.Pointer(&p))
 		log.Debug("##########################################################################################")
-		log.Debug(".............received: ", msg)
+		log.Debug("@@@@received: ", len(msg), "----", msg)
 		save2Redis(dealMsg(msg, conn, ch), msg)
 	}
-
 }
+
+//var upgrader = websocket.Upgrader{
+//	ReadBufferSize:  1024,
+//	WriteBufferSize: 1024,
+//	CheckOrigin: func(r *http.Request) bool {
+//		return true
+//	},
+//}
+
+//func HandlerWebsocket(w http.ResponseWriter, r *http.Request) {
+//	conn, err := upgrader.Upgrade(w, r, nil)
+//	if err != nil {
+//		log.Info(err)
+//		return
+//	}
+//	log.Info("....................建立连接..................")
+//	ch := make(chan MsgStat)
+//	defer func(conn net.Conn) {
+//		closeChan(ch)
+//		connStat[conn] = ""
+//		err := conn.Close()
+//		if err != nil {
+//		}
+//	}(conn)
+//	time.AfterFunc(time.Duration(Confg.Server.DelayMinutes)*time.Minute, func() {
+//		log.Info("延时函数执行啦！")
+//		delayConn(conn, ch)
+//	})
+//	go write2Client(conn, ch)
+//	for {
+//		_, p, err := conn.ReadMessage()
+//		//log.Debug("@@@@@ ", messageType, *(*string)(unsafe.Pointer(&p)))
+//		if err != nil {
+//			log.Error("--conn.ReadMessage err ", err)
+//			connStat[conn] = ""
+//			err := conn.Close()
+//			if err != nil {
+//			}
+//			return
+//		}
+//		msg := *(*string)(unsafe.Pointer(&p))
+//		log.Debug("##########################################################################################")
+//		log.Debug(".............received: ", msg)
+//		save2Redis(dealMsg(msg, conn, ch), msg)
+//	}
+//
+//}

@@ -8,7 +8,7 @@ import (
 	"github.com/techzhongyi/comlibgo/mhandler"
 	"github.com/techzhongyi/comlibgo/util"
 	gkCore "gkConn/src"
-	"net/http"
+	"net"
 	"path"
 )
 
@@ -23,6 +23,29 @@ func main() {
 	// 初始化redis
 	gkCore.RedCacheDbs = util.InitRedis(gkCore.Confg.Redis.Host+":"+gkCore.Confg.Redis.Port,
 		gkCore.Confg.Redis.Password, gkCore.Confg.Redis.Db["cache"])
-	http.HandleFunc("/gk_conn", gkCore.HandlerWebsocket)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", gkCore.Confg.Server.Port), nil))
+	// 监听地址和端口
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", gkCore.Confg.Server.Port))
+	if err != nil {
+		fmt.Println("监听失败:", err)
+		return
+	}
+	defer func(listener net.Listener) {
+		err := listener.Close()
+		if err != nil {
+
+		}
+	}(listener)
+	log.Info("服务器已启动，等待客户端连接.....")
+	for {
+		// 等待客户端连接
+		conn, err := listener.Accept()
+		if err != nil {
+			fmt.Println("接受连接失败:", err)
+			continue
+		}
+		log.Info("客户端连接成功:", conn.RemoteAddr())
+		// 启动一个goroutine处理客户端请求
+		go gkCore.HandleConnection(conn)
+	}
+
 }
