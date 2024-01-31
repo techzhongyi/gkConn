@@ -113,6 +113,7 @@ func write2Client(conn net.Conn, ch <-chan MsgStat) {
 
 }
 
+// 从conn中解析出消息
 func parseMsg(conn net.Conn) (_err error, _msg string) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -152,7 +153,6 @@ func HandleConnection(conn net.Conn) {
 	})
 	go write2Client(conn, ch)
 	for {
-		// 根据数据长度读取数据
 		err, msg := parseMsg(conn)
 		if err != nil {
 			log.Error("------------- parseMsg err ", err, msg)
