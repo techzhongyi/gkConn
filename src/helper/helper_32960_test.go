@@ -8,7 +8,7 @@ import (
 )
 
 func TestValidCode(t *testing.T) {
-	oriMsg := "23230501111111111111111111111111111111111101000611111111111112"
+	oriMsg := "23230501111111111111111111111111111111111101000611111111"
 	ok := ValidCode(oriMsg)
 	fmt.Println(ok)
 
@@ -88,12 +88,12 @@ func TestConver(t *testing.T) {
 
 func TestConver2(t *testing.T) {
 	// 10进制转16进制串
-	decimal := 82
+	decimal := 12
 	hex := fmt.Sprintf("%X", decimal)
 	fmt.Println(hex)
 
 	// 16进制串转10进制
-	xx, err := strconv.ParseInt("2323", 16, 64)
+	xx, err := strconv.ParseInt("000C", 16, 64)
 	if err != nil {
 		fmt.Println("转换失败:", err)
 		return

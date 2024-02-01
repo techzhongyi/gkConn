@@ -86,7 +86,7 @@ func GetFactoryInfo(msg string) (string, string) {
 // GetResponseMsg 返回应答消息
 func GetResponseMsg(responseStat string, msg string) string {
 	// 起始符 + 命令标识 + 应答标志 + 唯一标识码 + 加密方式 + 数据单元长度 + 数据单元 + 校验码
-	newMsg := msg[0:4] + msg[4:6] + responseStat + msg[8:42] + msg[42:44] + "0006" + msg[48:60] + "**"
+	newMsg := msg[0:4] + msg[4:6] + responseStat + msg[8:42] + msg[42:44] + "000C" + msg[48:60] + "**"
 	rr := GetBccChecksum(newMsg)
 	code := strconv.FormatUint(uint64(rr), 16)
 	if len(code) == 1 {
