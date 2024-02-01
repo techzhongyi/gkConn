@@ -26,13 +26,12 @@ func main() {
 	// 监听地址和端口
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", gkCore.Confg.Server.Port))
 	if err != nil {
-		fmt.Println("监听失败:", err)
+		log.Error("!!!监听失败", err)
 		return
 	}
 	defer func(listener net.Listener) {
 		err := listener.Close()
 		if err != nil {
-
 		}
 	}(listener)
 	log.Info("服务器已启动，等待客户端连接.....")
@@ -40,7 +39,7 @@ func main() {
 		// 等待客户端连接
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("接受连接失败:", err)
+			log.Error("!!!客户端连接失败", err)
 			continue
 		}
 		log.Info("客户端连接成功:", conn.RemoteAddr())
