@@ -126,6 +126,7 @@ func parseMsg(conn net.Conn) (_err error, _msg string) {
 	if err != nil {
 		return err, "-1"
 	}
+	log.Debug("------------->", string(bufferHead))
 	dataLen, err := strconv.ParseInt(string(bufferHead)[len(string(bufferHead))-4:], 16, 64)
 	if err != nil {
 		return err, "-2"
