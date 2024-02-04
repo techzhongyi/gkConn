@@ -1,6 +1,7 @@
 package gkCore
 
 import (
+	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
 	"gkConn/src/helper"
@@ -118,24 +119,28 @@ func parseMsg(conn net.Conn) (_err error, _msg string) {
 	defer func() {
 		if r := recover(); r != nil {
 			_err = fmt.Errorf("%s", r)
-			_msg = "-4"
+			_msg = UnknowErr
 		}
 	}()
 	bufferHead := make([]byte, 48)
 	_, err := conn.Read(bufferHead)
 	if err != nil {
-		return err, "-1"
+		return err, ReadHeadErr
 	}
-	log.Debug("------------->", string(bufferHead))
+	log.Debug("1111111 ", string(bufferHead))
+	if helper.Is32960(string(bufferHead)) == false {
+		return errors.New("not 32960"), ProtocolErr
+	}
 	dataLen, err := strconv.ParseInt(string(bufferHead)[len(string(bufferHead))-4:], 16, 64)
 	if err != nil {
-		return err, "-2"
+		return err, MsgParseErr
 	}
-	bufferBody := make([]byte, dataLen+2)
+	bufferBody := make([]byte, dataLen*2+2)
 	_, err = conn.Read(bufferBody)
 	if err != nil {
-		return err, "-3"
+		return err, ReadBodyErr
 	}
+	log.Debug("222222  ", string(bufferBody))
 	return nil, string(bufferHead) + string(bufferBody)
 }
 
@@ -156,12 +161,15 @@ func HandleConnection(conn net.Conn) {
 	for {
 		err, msg := parseMsg(conn)
 		if err != nil {
-			log.Error("------------- parseMsg err ", err, msg)
+			log.Errorf("------------- parseMsg err=%s, code=%s", err, msg)
+			if msg == ProtocolErr {
+				continue
+			}
 			connStat[conn] = ""
 			return
 		}
 		log.Debug("##########################################################################################")
-		log.Debug("@@@@received: ", len(msg), "----", msg)
+		log.Debugf("@@@@received: len=%d, msg=%s", len(msg), msg)
 		save2Redis(dealMsg(msg, conn, ch), msg)
 	}
 }

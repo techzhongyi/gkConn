@@ -63,7 +63,7 @@ func GetCommand(msg string) string {
 
 // GetReply 获取应答标识
 func GetReply(msg string) string {
-	return msg[6:8]
+	return strings.ToUpper(msg[6:8])
 }
 
 // GetFactoryInfo 解析获取用户名和密码
@@ -77,16 +77,16 @@ func GetFactoryInfo(msg string) (string, string) {
 		return "", ""
 	}
 	body := msg[48 : len(msg)-2]
-	name, _ := hex.DecodeString(body[16:40])
-	password, _ := hex.DecodeString(body[40:80])
+	name, _ := hex.DecodeString(body[len(body)-66 : len(body)-42])
+	password, _ := hex.DecodeString(body[len(body)-42 : len(body)-2])
 	return string(name), string(password)
 
 }
 
 // GetResponseMsg 返回应答消息
 func GetResponseMsg(responseStat string, msg string) string {
-	// 起始符 + 命令标识 + 应答标志 + 唯一标识码 + 加密方式 + 数据单元长度 + 数据单元 + 校验码
-	newMsg := msg[0:4] + msg[4:6] + responseStat + msg[8:42] + msg[42:44] + "000C" + msg[48:60] + "**"
+	// 起始符2 + 命令标识1 + 应答标志1 + 唯一标识码17 + 加密方式1 + 数据单元长度2 + 数据单元 + 校验码1
+	newMsg := msg[0:4] + msg[4:6] + responseStat + msg[8:42] + msg[42:44] + "0006" + msg[48:60] + "**"
 	rr := GetBccChecksum(newMsg)
 	code := strconv.FormatUint(uint64(rr), 16)
 	if len(code) == 1 {
