@@ -169,7 +169,7 @@ func HandleConnection(conn net.Conn) {
 			return
 		}
 		log.Debug("##########################################################################################")
-		log.Debugf("@@@@received: len=%d,  msg=%s", len(msg), msg)
+		log.Debugf("@@@@received:  len=%d,  msg=%s", len(msg), msg)
 		save2Redis(dealMsg(msg, conn, ch), msg)
 	}
 }
