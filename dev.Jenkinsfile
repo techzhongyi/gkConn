@@ -7,7 +7,7 @@ Server:
     Port: 8081
     LogPath: ./_log/
     MaxLen: 120000
-    DelayMinutes: 10
+    DelayMinutes: 15
 
 Redis:
   Host: localhost
