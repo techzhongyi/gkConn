@@ -58,6 +58,11 @@ func IsSignOut(msg string) bool {
 
 // GetCommand 获取命令标识
 func GetCommand(msg string) string {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Error("GetCommand ", r)
+		}
+	}()
 	return msg[4:6]
 }
 
