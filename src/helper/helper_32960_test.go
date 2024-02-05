@@ -61,18 +61,18 @@ func TestGenerateLogin(t *testing.T) {
 
 func TestConver(t *testing.T) {
 	// 将字符串编码成十六进制格式
-	//ss := "gkzydeepway1" // 要转换的字符串
-	//hexStr := hex.EncodeToString([]byte(ss))
-	//fmt.Println("字符串转十六进制:", hexStr, " len=", len(hexStr))
+	ss := "##\x05\xfeguokezhiyun00001\x01\x00\x00(\x02\x05\t\x1b3Ohgkzydeepway1swddf" // 要转换的字符串
+	hexStr := hex.EncodeToString([]byte(ss))
+	fmt.Println("字符串转十六进制:", hexStr, " len=", len(hexStr))
 
-	// 16进制转字符串
-	bytes, err := hex.DecodeString("fe")
-	if err != nil {
-		fmt.Println("解码失败:", err)
-		return
-	}
-	str := string(bytes)
-	fmt.Println("十六进制转字符串:", str)
+	//// 16进制转字符串
+	//bytes, err := hex.DecodeString("23")
+	//if err != nil {
+	//	fmt.Println("解码失败:", err)
+	//	return
+	//}
+	//str := string(bytes)
+	//fmt.Println("十六进制转字符串:", str)
 
 	//// 单个16进制转字符串
 	//hexStr2 := "34" // 十六进制字符串 "41"

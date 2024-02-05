@@ -122,7 +122,7 @@ func parseMsg(conn net.Conn) (_err error, _msg string) {
 			_msg = UnknowErr
 		}
 	}()
-	bufferHead := make([]byte, 48)
+	bufferHead := make([]byte, 24)
 	_, err := conn.Read(bufferHead)
 	if err != nil {
 		return err, ReadHeadErr
@@ -135,7 +135,8 @@ func parseMsg(conn net.Conn) (_err error, _msg string) {
 	if err != nil {
 		return err, MsgParseErr
 	}
-	bufferBody := make([]byte, dataLen*2+2)
+	log.Debug("333333 ", dataLen)
+	bufferBody := make([]byte, dataLen+1)
 	_, err = conn.Read(bufferBody)
 	if err != nil {
 		return err, ReadBodyErr
