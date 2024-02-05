@@ -162,9 +162,9 @@ func HandleConnection(conn net.Conn) {
 		err, msg := parseMsg(conn)
 		if err != nil {
 			log.Errorf("------------- parseMsg err=%s, code=%s", err, msg)
-			if msg == ProtocolErr {
-				continue
-			}
+			//if msg == ProtocolErr {
+			//	continue
+			//}
 			connStat[conn] = ""
 			return
 		}
