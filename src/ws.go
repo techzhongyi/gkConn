@@ -1,6 +1,7 @@
 package gkCore
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	log "github.com/sirupsen/logrus"
@@ -100,7 +101,8 @@ func write2Client(conn net.Conn, ch <-chan MsgStat) {
 		switch reply {
 		case "FE":
 			response := helper.GetResponseMsg(v.stat, v.msg)
-			_, err := conn.Write([]byte(response))
+			bmsg, _ := hex.DecodeString(response)
+			_, err := conn.Write(bmsg)
 			if err != nil {
 				log.Error("$$$$$$$$$$$$ reply err", err)
 			}
@@ -127,22 +129,25 @@ func parseMsg(conn net.Conn) (_err error, _msg string) {
 	if err != nil {
 		return err, ReadHeadErr
 	}
-	log.Debug("1111111 ", string(bufferHead))
-	if helper.Is32960(string(bufferHead)) == false {
+	head := hex.EncodeToString(bufferHead)
+	log.Debug("parseMsg head= ", head)
+	if helper.Is32960(head) == false {
 		return errors.New("not 32960"), ProtocolErr
 	}
-	dataLen, err := strconv.ParseInt(string(bufferHead)[len(string(bufferHead))-4:], 16, 64)
+	dataLen, err := strconv.ParseInt(head[len(head)-4:], 16, 64)
 	if err != nil {
 		return err, MsgParseErr
 	}
-	log.Debug("333333 ", dataLen)
+	log.Debug("parseMsg len=", dataLen)
 	bufferBody := make([]byte, dataLen+1)
 	_, err = conn.Read(bufferBody)
 	if err != nil {
 		return err, ReadBodyErr
 	}
-	log.Debug("222222  ", string(bufferBody))
-	return nil, string(bufferHead) + string(bufferBody)
+	body := hex.EncodeToString(bufferBody)
+	log.Debug("parseMsg body=  ", body)
+	log.Debug("parseMsg len =   ", len(head+body))
+	return nil, head + body
 }
 
 func HandleConnection(conn net.Conn) {

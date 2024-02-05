@@ -8,7 +8,7 @@ import (
 )
 
 func TestValidCode(t *testing.T) {
-	oriMsg := "232302014C464E41344C4441334C41583734323737010006170C1D0B261E1e"
+	oriMsg := "232302014c464e41344c4441334c41583734323737010006170c1d0b261e1e"
 	ok := ValidCode(oriMsg)
 	fmt.Println(ok)
 
@@ -61,18 +61,21 @@ func TestGenerateLogin(t *testing.T) {
 
 func TestConver(t *testing.T) {
 	// 将字符串编码成十六进制格式
-	ss := "##\x05\xfeguokezhiyun00001\x01\x00\x00(\x02\x05\t\x1b3Ohgkzydeepway1swddf" // 要转换的字符串
+	ss := "##\u0005�guokezhiyun00001\u0001\u0000\u0000(\u0002\u0004\u00111\u0000N�gkzydeepway1swddffgdr56u990hjkff\u0001" // 要转换的字符串
 	hexStr := hex.EncodeToString([]byte(ss))
-	fmt.Println("字符串转十六进制:", hexStr, " len=", len(hexStr))
+	fmt.Println("字符串转十六进制:", hexStr, " len=", len(hexStr), "---", len(ss))
 
+	xx := "232305fe67756f6b657a686979756e30303030310100002802041131004efb676b7a796465657077617931737764646666676472353675393930686a6b66660104"
 	//// 16进制转字符串
-	//bytes, err := hex.DecodeString("23")
-	//if err != nil {
-	//	fmt.Println("解码失败:", err)
-	//	return
-	//}
-	//str := string(bytes)
-	//fmt.Println("十六进制转字符串:", str)
+	bytes, err := hex.DecodeString(xx)
+	if err != nil {
+		fmt.Println("解码失败:", err)
+		return
+	}
+	str := string(bytes)
+	fmt.Println("十六进制转字符串:", str)
+	hexStr2 := hex.EncodeToString(bytes)
+	fmt.Println("ccccccc:", hexStr2)
 
 	//// 单个16进制转字符串
 	//hexStr2 := "34" // 十六进制字符串 "41"
