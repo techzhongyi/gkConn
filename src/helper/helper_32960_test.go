@@ -8,14 +8,14 @@ import (
 )
 
 func TestValidCode(t *testing.T) {
-	oriMsg := "232302014c464e41344c4441334c41583734323737010006170c1d0b261e1e"
+	oriMsg := "232307fe67756f6b657a686979756e30303030303101000093"
 	ok := ValidCode(oriMsg)
 	fmt.Println(ok)
 
 }
 
 func TestGetResponseMsg(t *testing.T) {
-	msg := "232305FE11111111111111111111111111111111110100521111111111112222676b7a796465657077617931737764646666676472353675393930686a6b666601a7"
+	msg := "232307fe67756f6b657a686979756e30303030303101000093"
 	reply := GetResponseMsg("01", msg)
 	fmt.Println("应答消息: ", reply, len(reply))
 	ok := ValidCode(reply)

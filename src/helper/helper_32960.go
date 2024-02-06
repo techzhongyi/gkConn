@@ -91,7 +91,15 @@ func GetFactoryInfo(msg string) (string, string) {
 // GetResponseMsg 返回应答消息
 func GetResponseMsg(responseStat string, msg string) string {
 	//          起始符2 + 命令标识1 + 应答标志1 + 唯一标识码17 + 加密方式1 + 数据单元长度2 + 数据单元 + 校验码1
-	newMsg := msg[0:4] + msg[4:6] + responseStat + msg[8:42] + msg[42:44] + "0006" + msg[48:60] + "**"
+	head := msg[0:48]
+	dataLen, _ := strconv.ParseInt(head[len(head)-4:], 16, 64)
+	newMsg := ""
+	// 如果数据单元长度是0 是心跳包 回复也是数据长度为0
+	if dataLen == 0 {
+		newMsg = msg[0:4] + msg[4:6] + responseStat + msg[8:42] + msg[42:44] + "0000" + "**"
+	} else {
+		newMsg = msg[0:4] + msg[4:6] + responseStat + msg[8:42] + msg[42:44] + "0006" + msg[48:60] + "**"
+	}
 	rr := GetBccChecksum(newMsg)
 	code := strconv.FormatUint(uint64(rr), 16)
 	if len(code) == 1 {
