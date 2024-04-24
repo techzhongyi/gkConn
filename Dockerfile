@@ -10,7 +10,7 @@ RUN go mod download
 
 COPY gkConn/src ./src
 COPY gkConn/config.yaml .
-COPY gkConn/startup.go .
+COPY gkConn/start_up.go .
 
 RUN CGO_ENABLED=0 go build -o docker-gkConn
 
