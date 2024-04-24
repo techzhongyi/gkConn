@@ -42,7 +42,7 @@ pipeline {
         stage('@@@-拉取代码 testing') {
             steps {
                 echo '准备拉取代码-gkConn + comlibgo'
-                checkout([$class: 'GitSCM', branches: [[name: '*/gkzy']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: './gkConn']], userRemoteConfigs: [[url: 'git@github.com:techzhongyi/gkConn.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: './gkConn']], userRemoteConfigs: [[url: 'git@github.com:techzhongyi/gkConn.git']]])
                 checkout([$class: 'GitSCM', branches: [[name: '*/v1.0']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: './comlibgo']], userRemoteConfigs: [[url: 'git@github.com:techzhongyi/comlibgo.git']]])
             }
         }
