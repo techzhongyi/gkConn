@@ -78,7 +78,7 @@ pipeline {
                     need_push = true
                 }
                 sh 'cp ./gkConn/Dockerfile .'
-                sh "docker build --tag registry-vpc.cn-qingdao.aliyuncs.com/gkzy_sys/gkConn:latest --no-cache ."
+                sh "docker build --tag registry-vpc.cn-qingdao.aliyuncs.com/gkzy_sys/gate4dw:latest --no-cache ."
             }
         }
         stage('Push image') {
@@ -87,7 +87,7 @@ pipeline {
             }
             steps {
                 sh 'echo gkzy@6789 | docker login -u gkzy9999 --password-stdin registry-vpc.cn-qingdao.aliyuncs.com'
-                sh "docker push registry-vpc.cn-qingdao.aliyuncs.com/gkzy_sys/gkConn:latest"
+                sh "docker push registry-vpc.cn-qingdao.aliyuncs.com/gkzy_sys/gate4dw:latest"
                 echo '上传镜像成功！'
 //                 sh "docker rmi registry-vpc.cn-qingdao.aliyuncs.com/zynewsapce/${config_file.Server.Name}:latest"
 //                 echo '删除本地镜像！'
