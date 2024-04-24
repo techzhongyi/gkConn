@@ -109,11 +109,11 @@ pipeline {
                 echo '准备重启项目-service_router.yaml 环境变量注入'
                 script {
                     def list = []
-                    def read = readYaml(file: '../service_router.yaml')
-                    for (element in read) {
-                        echo "${element.key} ${element.value}"
-                        list.add(element.key + '=' + element.value)
-                    }
+//                     def read = readYaml(file: '../service_router.yaml')
+//                     for (element in read) {
+//                         echo "${element.key} ${element.value}"
+//                         list.add(element.key + '=' + element.value)
+//                     }
                     dir('./build/bin') {
                         sh "ls"
                         sh "pwd"

@@ -24,7 +24,7 @@ func main() {
 	// 监听地址和端口
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", gkCore.Confg.Server.Port))
 	if err != nil {
-		log.Error("!!!监听失败", err)
+		log.Error("!!!监听失败.", err)
 		return
 	}
 	defer func(listener net.Listener) {
