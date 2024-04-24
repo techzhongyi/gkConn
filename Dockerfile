@@ -12,8 +12,6 @@ COPY gkConn/src ./src
 COPY gkConn/config.yaml .
 COPY gkConn/startup.go .
 
-COPY gkConn/__all_apis ./__all_apis
-
 RUN CGO_ENABLED=0 go build -o docker-gkConn
 
 ## Deploy
