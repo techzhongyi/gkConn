@@ -9,7 +9,6 @@ COPY gkConn/go.sum .
 RUN go mod download
 
 COPY gkConn/src ./src
-COPY gkConn/apis ./apis
 COPY gkConn/config.yaml .
 COPY gkConn/startup.go .
 
@@ -22,7 +21,6 @@ WORKDIR /
 
 COPY --from=build /app/gkConn/docker-gkConn /app/docker-gkConn
 COPY --from=build /app/gkConn/config.yaml /app/config.yaml
-COPY --from=build /app/gkConn/apis /app/apis
 
 RUN ls /app
 
