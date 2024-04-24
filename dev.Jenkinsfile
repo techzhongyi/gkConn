@@ -10,7 +10,7 @@ Server:
 
 Kafka:
   Uri: 118.190.207.17:9095
-  Topic: topic_conn9999
+  Topic: topic_conn888
 
 
 Factorys:
