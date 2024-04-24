@@ -6,7 +6,6 @@ import (
 	"github.com/kardianos/osext"
 	log "github.com/sirupsen/logrus"
 	"github.com/techzhongyi/comlibgo/mhandler"
-	"github.com/techzhongyi/comlibgo/util"
 	gkCore "gkConn/src"
 	"net"
 	"path"
@@ -20,9 +19,8 @@ func main() {
 	gkCore.ParseConfig(path.Join(curDir, "config.yaml"))
 	mhandler.InitLog(gkCore.Confg.Server.LogPath, gkCore.Confg.Server.Debug)
 	log.Info(" 解析项目配置文件config + api... ")
-	// 初始化redis
-	gkCore.RedCacheDbs = util.InitRedis(gkCore.Confg.Redis.Host+":"+gkCore.Confg.Redis.Port,
-		gkCore.Confg.Redis.Password, gkCore.Confg.Redis.Db["cache"])
+	// 初始化kafka
+	gkCore.InitKakfaProducer()
 	// 监听地址和端口
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", gkCore.Confg.Server.Port))
 	if err != nil {

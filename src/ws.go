@@ -176,6 +176,6 @@ func HandleConnection(conn net.Conn) {
 		}
 		log.Debug("##########################################################################################")
 		log.Debugf("@@@@received:  len=%d,  msg=%s", len(msg), msg)
-		save2Redis(dealMsg(msg, conn, ch), msg)
+		Save2Kafka(dealMsg(msg, conn, ch), msg)
 	}
 }

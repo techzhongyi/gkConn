@@ -3,17 +3,21 @@
 package gkCore
 
 import (
+	"github.com/IBM/sarama"
 	log "github.com/sirupsen/logrus"
 )
 
-// save2Redis 将数据存储到redis
-func save2Redis(factoryId, msg string) {
+// Save2Kafka 将数据存储到kafka
+func Save2Kafka(factoryId, msg string) {
 	if factoryId == "" || factoryId == LoginErr {
+		log.Error("save2Kafka.......factoryId=", factoryId)
 		return
 	}
-	if RedCacheDbs.LLen(factoryId).Val() > Confg.Server.MaxLen {
-		log.Error("Length exceeds maximum.......", RedCacheDbs.LLen(factoryId).Val())
-		return
+	kMsg := &sarama.ProducerMessage{
+		Topic: Confg.KafKa.Topic,
+		Key:   sarama.StringEncoder(factoryId),
+		Value: sarama.StringEncoder(msg),
 	}
-	RedCacheDbs.LPush(factoryId, msg)
+	KafkaProducer.Input() <- kMsg
+
 }

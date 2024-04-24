@@ -6,15 +6,8 @@ Server:
     Debug: True
     Port: 8081
     LogPath: ./_log/
-    MaxLen: 120000
     DelayMinutes: 15
 
-Redis:
-  Host: localhost
-  Port: 6379
-  Password: redis@6789
-  Db:
-    cache: 11  # 缓存
 
 Factorys:
   - # 车企用户名密码

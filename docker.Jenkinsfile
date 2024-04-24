@@ -4,37 +4,21 @@ def need_push = false
 def first_clone = true // httpCore 每次都需要build 因为不知道其他项目的apps是否有变化
 def CONFIG_FILE = '''# 基础环境配置
 Server:
-    Name: http_core
-    Port: 8885
-    ApiPath: [ ../user/apis,  ../assets/apis, ../share/apis, ../check/apis, ../mete_parse/apis]
+    Name: gkConn
+    Port: 8081
     StoragePath: ./_storage
-    ThirdToken: ${THIRD_TOKEN}
+    DelayMinutes: ${DELAY_MINUTES}
 
-# 系统内鉴权类型
-AuthAll:
-    - # 后台管理者用户
-     roleName: Admin
-     ExpiredDuration: 120
-    - # core将重新颁发证书-先调用微服务返回成功后刷新（常用于登陆，身份信息变更刷新）
-     RoleName: Offer  # 可以和其他权限组合使用
-     ExpiredDuration: -1
-    - # 为公共方法不鉴权（本系统内接口）
-     RoleName: Public  # 只能单独出现，不能和其他组合使用
-     ExpiredDuration: -1
-    - # 为系统全体已登陆用户
-     RoleName: Protected  # 只能单独出现，不能和其他组合使用
-     ExpiredDuration: -1
-
-Jwt:
-     Iss: ${JWT_ISS}
-     Secret: ${JWT_SECRET}
+Factorys:
+  - # 车企用户名密码
+    Name:  ${FACTORY_NAME}
+    Password:  ${FACTORY_PASS}
 '''
-
 pipeline {
     agent {
         node {
-          label 'iot-dev'
-          customWorkspace './workspace/docker-jianzai/httpCore'
+          label 'gk-dev'
+          customWorkspace './workspace/docker_gkzy/gkConn'
         }
     }
 
@@ -45,13 +29,11 @@ pipeline {
                     config_file = readYaml text: CONFIG_FILE
                     echo config_file.Server.Name
                     echo "${config_file.Server.Port}"
-                    dir ('./httpCore') {
-                        try {
-                            sh 'git checkout .'
-                        } catch (Exception ex) {
-                            first_clone = true
-                            println('ignore, before git clone...')
-                        }
+                    try {
+                        sh 'git checkout .'
+                    } catch (Exception ex) {
+                        first_clone = true
+                        println('ignore, before git clone...')
                     }
                 }
             }
@@ -59,19 +41,9 @@ pipeline {
 
         stage('@@@-拉取代码 testing') {
             steps {
-                echo '准备拉取代码-httpCore + comlibgo'
-                checkout([$class: 'GitSCM', branches: [[name: '*/jianzai']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: './httpCore']], userRemoteConfigs: [[url: 'git@github.com:techzhongyi/httpCore.git']]])
-                checkout([$class: 'GitSCM', branches: [[name: '*/jianzai']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: './comlibgo']], userRemoteConfigs: [[url: 'git@github.com:techzhongyi/comlibgo.git']]])
-            }
-        }
-
-        stage('@@@-准备各个项目的apis') {
-            steps {
-                sh 'mkdir -p ./httpCore/__all_apis/user/apis && cp ../user/apis/* ./httpCore/__all_apis/user/apis/'
-                sh 'mkdir -p ./httpCore/__all_apis/assets/apis && cp ../assets/apis/* ./httpCore/__all_apis/assets/apis/'
-                sh 'mkdir -p ./httpCore/__all_apis/share/apis && cp ../share/apis/* ./httpCore/__all_apis/share/apis/'
-                sh 'mkdir -p ./httpCore/__all_apis/check/apis && cp ../check/apis/* ./httpCore/__all_apis/check/apis/'
-                sh 'mkdir -p ./httpCore/__all_apis/mete_parse/apis && cp ../mete_parse/apis/* ./httpCore/__all_apis/mete_parse/apis/'
+                echo '准备拉取代码-gkConn + comlibgo'
+                checkout([$class: 'GitSCM', branches: [[name: '*/gkzy']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: './gkConn']], userRemoteConfigs: [[url: 'git@github.com:techzhongyi/gkConn.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/v1.0']], extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: './comlibgo']], userRemoteConfigs: [[url: 'git@github.com:techzhongyi/comlibgo.git']]])
             }
         }
 
@@ -79,15 +51,15 @@ pipeline {
             // todo 判断config_file文件和本地比较是否有变化
             when {
                 anyOf {
-                    expression { return !fileExists('./httpCore/config.yaml') }
+                    expression { return !fileExists('./gkConn/config.yaml') }
                     expression {
-                        def content = readFile(file: './httpCore/config.yaml')
+                        def content = readFile(file: './gkConn/config.yaml')
                         return content != CONFIG_FILE
                     }
                 }
             }
             steps {
-                writeFile encoding: 'utf-8', file: './httpCore/config.yaml', text: CONFIG_FILE
+                writeFile encoding: 'utf-8', file: './gkConn/config.yaml', text: CONFIG_FILE
                 echo "Success-创建服务配置文件"
             }
         }
@@ -105,20 +77,20 @@ pipeline {
                 script {
                     need_push = true
                 }
-                sh 'cp ./httpCore/Dockerfile .'
-                sh "docker build --tag registry.cn-beijing.aliyuncs.com/zy_jz/${config_file.Server.Name}:latest --no-cache ."
+                sh 'cp ./gkConn/Dockerfile .'
+                sh "docker build --tag registry-vpc.cn-qingdao.aliyuncs.com/gkzy_sys/gkConn:latest --no-cache ."
             }
         }
-
-        stage('@@@-Push image') {
+        stage('Push image') {
             when {
                 expression { return need_push }
             }
             steps {
-                sh 'echo xdkj@6789 | docker login -u 新的空间 --password-stdin registry.cn-beijing.aliyuncs.com'
-                sh "docker push registry.cn-beijing.aliyuncs.com/zy_jz/${config_file.Server.Name}:latest"
+                sh 'echo gkzy@6789 | docker login -u gkzy9999 --password-stdin registry-vpc.cn-qingdao.aliyuncs.com'
+                sh "docker push registry-vpc.cn-qingdao.aliyuncs.com/gkzy_sys/gkConn:latest"
                 echo '上传镜像成功！'
-                sh 'rm -rf ./httpCore/__all_apis'
+//                 sh "docker rmi registry-vpc.cn-qingdao.aliyuncs.com/zynewsapce/${config_file.Server.Name}:latest"
+//                 echo '删除本地镜像！'
             }
         }
     }

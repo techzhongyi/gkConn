@@ -8,7 +8,7 @@ import (
 )
 
 func TestValidCode(t *testing.T) {
-	oriMsg := "232307fe67756f6b657a686979756e30303030303101000093"
+	oriMsg := "2323070167756f6b657a686979756e3030303030310100006c"
 	ok := ValidCode(oriMsg)
 	fmt.Println(ok)
 
