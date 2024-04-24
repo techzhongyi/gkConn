@@ -2,29 +2,29 @@ FROM golang:1.17-buster as build
 WORKDIR /app
 ENV GOPROXY="https://goproxy.cn,direct"
 COPY comlibgo ./comlibgo
-WORKDIR /app/httpCore
-COPY httpCore/go.mod .
-COPY httpCore/go.sum .
+WORKDIR /app/gkConn
+COPY gkConn/go.mod .
+COPY gkConn/go.sum .
 
 RUN go mod download
 
-COPY httpCore/src ./src
-COPY httpCore/config.yaml .
-COPY httpCore/startup.go .
+COPY gkConn/src ./src
+COPY gkConn/config.yaml .
+COPY gkConn/startup.go .
 
-COPY httpCore/__all_apis ./__all_apis
+COPY gkConn/__all_apis ./__all_apis
 
-RUN CGO_ENABLED=0 go build -o docker-httpCore
+RUN CGO_ENABLED=0 go build -o docker-gkConn
 
 ## Deploy
 FROM alpine:3.9
 RUN apk add ca-certificates
 WORKDIR /
-COPY --from=build /app/httpCore/docker-httpCore /app/exec/docker-httpCore
-COPY --from=build /app/httpCore/config.yaml /app/exec/config.yaml
-COPY --from=build /app/httpCore/__all_apis/ /app/
+COPY --from=build /app/gkConn/docker-gkConn /app/exec/docker-gkConn
+COPY --from=build /app/gkConn/config.yaml /app/exec/config.yaml
+COPY --from=build /app/gkConn/__all_apis/ /app/
 
 WORKDIR /app/exec
 
-ENTRYPOINT ["/app/exec/docker-httpCore"]
+ENTRYPOINT ["/app/exec/docker-gkConn"]
 
