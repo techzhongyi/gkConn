@@ -25,7 +25,7 @@ Factorys:
 pipeline {
     agent {
         node {
-          label 'gkDataCenter-dev'
+          label 'gk-dev'
           customWorkspace './workspace/gkDataCenter/gkConn'
         }
     }
