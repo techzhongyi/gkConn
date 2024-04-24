@@ -9,20 +9,25 @@ COPY gkConn/go.sum .
 RUN go mod download
 
 COPY gkConn/src ./src
+COPY gkConn/apis ./apis
 COPY gkConn/config.yaml .
 COPY gkConn/startup.go .
 
 RUN CGO_ENABLED=0 go build -o docker-gkConn
 
-## Deploy
+## Deploy..
 FROM alpine:3.9
 RUN apk add ca-certificates
 WORKDIR /
-COPY --from=build /app/gkConn/docker-gkConn /app/exec/docker-gkConn
-COPY --from=build /app/gkConn/config.yaml /app/exec/config.yaml
-COPY --from=build /app/gkConn/__all_apis/ /app/
 
-WORKDIR /app/exec
+COPY --from=build /app/gkConn/docker-gkConn /app/docker-gkConn
+COPY --from=build /app/gkConn/config.yaml /app/config.yaml
+COPY --from=build /app/gkConn/apis /app/apis
 
-ENTRYPOINT ["/app/exec/docker-gkConn"]
+RUN ls /app
 
+ENTRYPOINT ["/app/docker-gkConn"]
+
+
+# 注意！！！ 该docker file 必须在上级目录运行 /app/comligo  /app/patchCore  /app/Dockerfile  这种目录结构
+# 通过Jenkins部署实现上述自动化打包构建
