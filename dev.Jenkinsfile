@@ -8,6 +8,10 @@ Server:
     LogPath: ./_log/
     DelayMinutes: 15
 
+Kafka:
+  Uri: 118.190.207.17:9095
+  Topic: topic_conn999
+
 
 Factorys:
   - # 车企用户名密码
