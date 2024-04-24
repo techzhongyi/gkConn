@@ -174,7 +174,7 @@ func HandleConnection(conn net.Conn) {
 			connStat[conn] = ""
 			return
 		}
-		log.Debug("##########################################################################################")
+		log.Debug("###########################################################################################")
 		log.Debugf("@@@@received:  len=%d,  msg=%s", len(msg), msg)
 		Save2Kafka(dealMsg(msg, conn, ch), msg)
 	}
