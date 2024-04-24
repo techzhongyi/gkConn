@@ -1,4 +1,4 @@
-FROM golang:1.17-buster as build
+FROM golang:1.20-buster as build
 WORKDIR /app
 ENV GOPROXY="https://goproxy.cn,direct"
 COPY comlibgo ./comlibgo

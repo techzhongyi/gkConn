@@ -89,7 +89,7 @@ func validFactory(msg string) string {
 			return name
 		}
 	}
-	log.Error("--------------login fail")
+	log.Error("---------------login fail")
 	return LoginErr
 
 }
