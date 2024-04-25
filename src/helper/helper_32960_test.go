@@ -91,9 +91,9 @@ func TestConver(t *testing.T) {
 
 func TestConver2(t *testing.T) {
 	// 10进制转16进制串
-	//decimal := 6
-	//hex := fmt.Sprintf("%X", decimal)
-	//fmt.Println(hex)
+	decimal := 78
+	hex := fmt.Sprintf("%X", decimal)
+	fmt.Println(hex)
 	//02010e21354e7f676b7a796465657077617931737764646666676472353675393930686a6b666601
 	// 16进制串转10进制 02010e21354e
 	xx1, _ := strconv.ParseInt("02", 16, 64)
@@ -106,9 +106,19 @@ func TestConver2(t *testing.T) {
 	fmt.Println(xx4)
 	xx5, _ := strconv.ParseInt("35", 16, 64)
 	fmt.Println(xx5)
-	xx6, _ := strconv.ParseInt("4e", 16, 64)
+	xx6, _ := strconv.ParseInt("4E", 16, 64)
 	fmt.Println(xx6)
 
 	fmt.Println("-------------- ", xx1, xx2, xx3, xx4, xx5, xx6)
+
+}
+
+func TestMes(t *testing.T) {
+	//msg := "232302fe4c4457544553543230323331313037313201002518041811370b01ffff010000ffffffff0000000000ff0f00000000050006cbba5b0157e54a9f"
+	//fmt.Println(GetCommand(msg))
+	head := "232302fe4c44575445535432303233313130373132010025"
+	fmt.Println(len(head))
+	dataLen, _ := strconv.ParseInt(head[len(head)-4:], 16, 64)
+	fmt.Println(dataLen)
 
 }
