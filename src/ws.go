@@ -60,6 +60,10 @@ func dealMsg(msg string, conn net.Conn, ch chan<- MsgStat) string {
 				if connStat[conn] == LoginErr {
 					responseStat = MsgFail
 				}
+			} else {
+				log.Info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 非登录状态 >>>>>>>>>>>>>>>>>>>>>>>>>", connStat[conn])
+				return ""
+
 			}
 		} else {
 			// 登出操作重置连接状态
